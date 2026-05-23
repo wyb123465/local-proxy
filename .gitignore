@@ -1,0 +1,16 @@
+﻿# Logs
+proxy.log
+usage.log
+*.log.*
+
+# Python
+__pycache__/
+venv/
+*.pyc
+
+# Config (contains API keys)
+config.json
+
+# IDE
+.vscode/
+.idea/

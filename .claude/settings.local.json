@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m json.tool config.json)",
+      "Bash(python fix_output_index.py)",
+      "Bash(python fix_tool_call.py)",
+      "Bash(python fix_logging.py)",
+      "Bash(python -m py_compile proxy.py)",
+      "Bash(python -m py_compile translator.py)",
+      "WebSearch",
+      "Bash(curl *)",
+      "Bash(taskkill //f //im python.exe)",
+      "Bash(python -c \"import json; json.load\\(open\\('config.json'\\)\\); print\\('config.json valid'\\)\")",
+      "Bash(python -c \"from translator import StreamTranslator; t = StreamTranslator\\('test', 'mimo-v2.5-pro'\\); print\\(f'_output_char_count = {t._output_char_count}'\\)\")"
+    ]
+  }
+}

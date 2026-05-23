@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Local Proxy Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}:root{--bg:#0b0f19;--bg2:#101624;--bg3:#151c2c;--bg4:#1b2337;--bdr:rgba(255,255,255,.06);--bdr2:rgba(255,255,255,.1);--t1:#e2e8f0;--t2:#94a3b8;--t3:#64748b;--ac:#6366f1;--acg:rgba(99,102,241,.25);--acs:rgba(99,102,241,.1);--gn:#10b981;--gns:rgba(16,185,129,.12);--rd:#f43f5e;--rds:rgba(244,63,94,.12);--r:12px;--rs:8px;--ease:cubic-bezier(.4,0,.2,1)}body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;line-height:1.5;-webkit-font-smoothing:antialiased}.layout{display:flex;min-height:100vh}.sidebar{width:220px;background:var(--bg2);border-right:1px solid var(--bdr);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:10;transition:transform .3s var(--ease)}.sidebar-header{padding:20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bdr)}.sidebar-logo{width:34px;height:34px;border-radius:var(--rs);background:linear-gradient(135deg,var(--ac),#818cf8);display:flex;align-items:center;justify-content:center;font-size:1.1rem;box-shadow:0 0 12px var(--acg)}.sidebar-title{font-size:1rem;font-weight:700;letter-spacing:-.02em}.sidebar-title span{background:linear-gradient(135deg,#818cf8,var(--ac));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.sidebar-nav{flex:1;padding:12px 10px;display:flex;flex-direction:column;gap:2px}.ni{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--rs);color:var(--t3);font-size:.82rem;font-weight:500;cursor:pointer;transition:all .2s var(--ease);border:1px solid transparent;user-select:none}.ni:hover{color:var(--t2);background:rgba(255,255,255,.03)}.ni.active{color:var(--t1);background:var(--acs);border-color:rgba(99,102,241,.15)}.ni .ico{font-size:1.1rem;width:22px;text-align:center;flex-shrink:0}.sidebar-footer{padding:14px 16px;border-top:1px solid var(--bdr);display:flex;align-items:center;gap:8px}.lang-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;background:var(--bg4);border:1px solid var(--bdr);border-radius:16px;color:var(--t2);font-size:.74rem;font-weight:500;font-family:inherit;cursor:pointer;transition:all .2s var(--ease)}.lang-btn:hover{border-color:var(--ac);color:var(--t1)}.status-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:var(--gns);border:1px solid rgba(16,185,129,.2);border-radius:16px;font-size:.72rem;font-weight:500;color:var(--gn)}.sdot{width:6px;height:6px;border-radius:50%;background:var(--gn);box-shadow:0 0 6px rgba(16,185,129,.5);animation:pulse 2s ease infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}.main{flex:1;margin-left:220px;min-width:0}.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid var(--bdr);background:rgba(16,22,36,.9);position:sticky;top:0;z-index:5;backdrop-filter:blur(12px)}.topbar-title{font-size:.88rem;font-weight:600;color:var(--t2)}.model-select{padding:6px 28px 6px 12px;background:var(--bg4);border:1px solid var(--bdr);border-radius:var(--rs);color:var(--t1);font-size:.78rem;font-weight:500;font-family:inherit;cursor:pointer;outline:none}.model-select:hover{border-color:var(--ac)}.model-select:focus{border-color:var(--ac);box-shadow:0 0 0 2px var(--acs)}.page{display:none;padding:24px 28px 40px;animation:fadeUp .3s var(--ease)}.page.active{display:block}@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}.card{background:var(--bg3);border:1px solid var(--bdr);border-radius:var(--r);padding:20px 22px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.3),0 4px 12px rgba(0,0,0,.15);transition:border-color .25s var(--ease),box-shadow .25s var(--ease)}.card:hover{border-color:var(--bdr2);box-shadow:0 4px 20px rgba(0,0,0,.25)}.card-head{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--bdr)}.card-icon{width:30px;height:30px;border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-size:.88rem}.card-head h2{font-size:.74rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t2)}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}.stats.mini{grid-template-columns:1fr 1fr}.stat{padding:14px;background:var(--bg4);border-radius:var(--rs);border:1px solid var(--bdr);transition:all .2s var(--ease)}.stat:hover{border-color:var(--bdr2)}.stat-label{font-size:.68rem;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}.stat-val{font-size:.92rem;font-weight:600;font-family:'SF Mono','JetBrains Mono',monospace;color:var(--t1)}.stat-val.accent{color:var(--ac)}.stat-val.clickable{cursor:pointer;color:var(--ac)}.stat-val.clickable:hover{text-decoration:underline}.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.rbtns{display:flex;gap:4px;margin-bottom:14px}.rbtn{padding:6px 14px;border:none;border-radius:var(--rs);background:var(--bg4);color:var(--t3);font-size:.76rem;font-weight:500;font-family:inherit;cursor:pointer;transition:all .2s var(--ease);border:1px solid var(--bdr)}.rbtn.on{background:var(--ac);color:#fff;border-color:var(--ac);box-shadow:0 2px 8px var(--acg)}.rbtn:hover:not(.on){color:var(--t2);border-color:var(--bdr2)}.mr{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bdr);font-size:.8rem}.mr:last-child{border-bottom:none}.mr-n{color:var(--t1);font-weight:500}.mr-d{color:var(--t2);font-size:.76rem}.rr{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--bdr);font-size:.76rem;transition:background .15s var(--ease)}.rr:hover{background:rgba(255,255,255,.015)}.rr:last-child{border-bottom:none}.rr-t{color:var(--t3);white-space:nowrap;flex-shrink:0}.rr-m{color:var(--t1);font-weight:500}.rr-k{color:var(--ac);font-family:monospace;font-size:.74rem}.rr-e{color:var(--rd);font-size:.7rem;margin-left:4px}.error-log{max-height:180px;overflow-y:auto;border-radius:var(--rs);border:1px solid var(--bdr)}.error-log:empty{display:none}.er{padding:8px 12px;font-size:.74rem;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px}.er:last-child{border-bottom:none}.er:hover{background:rgba(255,255,255,.015)}.er-t{color:var(--t3);white-space:nowrap;flex-shrink:0}.er-m{color:var(--ac);font-weight:500;flex-shrink:0}.er-msg{color:var(--rd);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tips-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.tip{padding:16px;background:var(--bg4);border-radius:var(--r);border:1px solid var(--bdr);transition:all .2s var(--ease)}.tip:hover{border-color:rgba(99,102,241,.25);transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.2)}.tip-e{font-size:1.4rem;margin-bottom:8px}.tip-t{font-size:.84rem;font-weight:600;color:var(--t1);margin-bottom:4px}.tip-d{font-size:.74rem;color:var(--t3);line-height:1.6}.tabs{display:flex;gap:2px;margin-bottom:18px;background:var(--bg4);border-radius:var(--r);padding:3px;border:1px solid var(--bdr)}.tbtn{flex:1;padding:8px 14px;border:none;border-radius:var(--rs);background:transparent;color:var(--t3);font-size:.8rem;font-weight:500;cursor:pointer;transition:all .2s var(--ease);font-family:inherit}.tbtn.on{background:var(--ac);color:#fff;box-shadow:0 2px 8px var(--acg)}.tbtn:hover:not(.on){color:var(--t2);background:rgba(255,255,255,.02)}.fg{margin-bottom:14px}.fg label{display:block;font-size:.74rem;font-weight:500;color:var(--t2);margin-bottom:5px}.fg input,.fg select{width:100%;padding:8px 12px;background:var(--bg4);border:1px solid var(--bdr);border-radius:var(--rs);color:var(--t1);font-size:.82rem;font-family:inherit;outline:none;transition:border-color .2s var(--ease)}.fg input:focus,.fg select:focus{border-color:var(--ac);box-shadow:0 0 0 2px var(--acs)}.irow{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}.irow .fg{flex:1;min-width:120px;margin-bottom:0}.btn{padding:8px 16px;border:none;border-radius:var(--rs);font-size:.78rem;font-weight:500;font-family:inherit;cursor:pointer;transition:all .2s var(--ease);display:inline-flex;align-items:center;gap:6px}.btn-p{background:var(--ac);color:#fff;box-shadow:0 2px 8px var(--acg)}.btn-p:hover{background:#5558e6;transform:translateY(-1px)}.btn-s{padding:6px 12px;font-size:.74rem}.btn-d{background:var(--rds);color:var(--rd);border:1px solid rgba(244,63,94,.2)}.btn-d:hover{background:rgba(244,63,94,.2)}.tag{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:var(--bg4);border:1px solid var(--bdr);border-radius:16px;font-size:.74rem;color:var(--t2);margin:3px}.tag .x{cursor:pointer;color:var(--t3);font-size:.8rem;transition:color .15s}.tag .x:hover{color:var(--rd)}.pvc{background:var(--bg4);border:1px solid var(--bdr);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;transition:border-color .2s var(--ease)}.pvc:hover{border-color:var(--bdr2)}.pvc-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.pvc-n{font-size:.86rem;font-weight:600;color:var(--t1)}.pvc-f{font-size:.74rem;color:var(--t3);margin-bottom:4px}.pvc-f label{color:var(--t2);font-weight:500;margin-right:4px}.toast-wrap{position:fixed;top:16px;right:16px;z-index:100;display:flex;flex-direction:column;gap:6px}.tst{padding:10px 16px;border-radius:var(--rs);font-size:.78rem;font-weight:500;animation:tin .35s var(--ease);box-shadow:0 4px 16px rgba(0,0,0,.3)}.tst.ok{background:#064e3b;color:#6ee7b7;border:1px solid rgba(16,185,129,.2)}.tst.err{background:#4c0519;color:#fda4af;border:1px solid rgba(244,63,94,.2)}@keyframes tin{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.15)}.empty{text-align:center;padding:24px;color:var(--t3);font-size:.8rem}.mob-menu{display:none;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid var(--bdr);border-radius:var(--rs);background:var(--bg4);color:var(--t1);cursor:pointer;font-size:1.1rem}@media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.grid-2{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.mob-menu{display:flex!important}}
+
+
+.provider-card{background:var(--bg4);border:1px solid var(--bdr);border-radius:var(--r);padding:16px 18px;margin-bottom:12px;transition:border-color .2s var(--ease),box-shadow .2s var(--ease)}
+.provider-card:hover{border-color:var(--bdr2);box-shadow:0 2px 12px rgba(0,0,0,.18)}
+.pv-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px;flex-wrap:wrap}
+.pv-name{font-size:.88rem;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:6px}
+.pv-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pv-dot.has-key{background:var(--gn);box-shadow:0 0 6px rgba(16,185,129,.5)}
+.pv-dot.no-key{background:var(--rd);box-shadow:0 0 6px rgba(244,63,94,.35)}
+.pv-actions{display:flex;gap:6px;flex-wrap:wrap}
+.pv-fields{display:grid;gap:10px}
+.pv-field-label{font-size:.72rem;font-weight:500;color:var(--t3);margin-bottom:4px}
+.pv-fields input[type=text],.pv-fields input[type=password],.pv-fields input:not([type]){width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--bdr);border-radius:var(--rs);color:var(--t1);font-size:.82rem;font-family:inherit;outline:none;transition:border-color .2s var(--ease)}
+.pv-fields input:focus{border-color:var(--ac);box-shadow:0 0 0 2px var(--acs)}
+.empty-state{text-align:center;padding:16px;color:var(--t3);font-size:.8rem}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--gn);box-shadow:0 0 6px rgba(16,185,129,.5);animation:pulse 2s ease infinite;display:inline-block}
+
+</style>
+</head>
+<body>
+<div class="toast-wrap" id="toasts"></div>
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">⚡</div>
+    <div class="sidebar-title"><span>Local</span> Proxy</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="ni active" data-page="dashboard" onclick="switchPage('dashboard')"><span class="ico">📊</span> <span data-i18n="navDash">Dashboard</span></div>
+    <div class="ni" data-page="usage" onclick="switchPage('usage')"><span class="ico">📈</span> <span data-i18n="navUsage">Usage</span></div>
+    <div class="ni" data-page="config" onclick="switchPage('config')"><span class="ico">⚙️</span> <span data-i18n="navCfg">Config</span></div>
+    <div class="ni" data-page="tips" onclick="switchPage('tips')"><span class="ico">💡</span> <span data-i18n="navTips">Tips</span></div>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="lang-btn" onclick="toggleLang()">🌐 <span id="langLabel">EN</span></button>
+    <div class="status-pill"><span class="sdot"></span> <span data-i18n="statusRunning">Running</span></div>
+  </div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="mob-menu" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+      <span class="topbar-title" id="pageTitle" data-i18n="navDash">Dashboard</span>
+    </div>
+    <select id="headerModel" class="model-select" onchange="switchModelFromHeader()"></select>
+  </div>
+  <div class="page active" id="page-dashboard">
+    <div class="card">
+      <div class="card-head"><div class="card-icon" style="background:var(--gns)">📡</div><h2 data-i18n="systemStatus">System Status</h2></div>
+      <div class="stats">
+        <div class="stat"><div class="stat-label" data-i18n="port">Port</div><div class="stat-val accent" id="sPort">—</div></div>
+        <div class="stat"><div class="stat-label" data-i18n="activeModel">Active Model</div><div class="stat-val clickable" id="sModel" onclick="quickSwitchModel()" title="Click to switch">—</div></div>
+        <div class="stat"><div class="stat-label" data-i18n="provider">Provider</div><div class="stat-val" id="sProvider">—</div></div>
+        <div class="stat"><div class="stat-label" data-i18n="providersReady">Providers Ready</div><div class="stat-val accent" id="sReady">—</div></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head"><div class="card-icon" style="background:var(--acs)">📊</div><h2 data-i18n="usageTitle">Token Usage</h2></div>
+        <div class="stats mini">
+          <div class="stat"><div class="stat-label" data-i18n="usageInput">Input</div><div class="stat-val accent" id="sInput">—</div></div>
+          <div class="stat"><div class="stat-label" data-i18n="usageOutput">Output</div><div class="stat-val accent" id="sOutput">—</div></div>
+          <div class="stat"><div class="stat-label" data-i18n="usageTotal">Total</div><div class="stat-val" id="sTotal">—</div></div>
+          <div class="stat"><div class="stat-label" data-i18n="usageRequests">Requests</div><div class="stat-val" id="sReqs">—</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-icon" style="background:var(--rds)">⚠️</div><h2 data-i18n="recentErrors">Errors</h2></div>
+        <div class="stat" style="margin-bottom:12px"><div class="stat-label">Total Errors</div><div class="stat-val" id="sErrors" style="color:var(--rd)">0</div></div>
+        <div id="errorLogDash" class="error-log"></div>
+      </div>
+    </div>
+  </div>
+  <div class="page" id="page-usage">
+    <div class="card">
+      <div class="card-head"><div class="card-icon" style="background:var(--acs)">📈</div><h2 data-i18n="usageTitle">Token Usage</h2></div>
+      <div class="rbtns">
+        <button class="rbtn on" onclick="setTimeRange('today')" id="rangeToday">今天</button>
+        <button class="rbtn" onclick="setTimeRange('week')" id="rangeWeek">本周</button>
+        <button class="rbtn" onclick="setTimeRange('all')" id="rangeAll">总计</button>
+      </div>
+      <div class="stats" style="margin-bottom:16px">
+        <div class="stat"><div class="stat-label" data-i18n="usageInput">Input</div><div class="stat-val accent" id="sInput2">—</div></div>
+        <div class="stat"><div class="stat-label" data-i18n="usageOutput">Output</div><div class="stat-val accent" id="sOutput2">—</div></div>
+        <div class="stat"><div class="stat-label" data-i18n="usageTotal">Total</div><div class="stat-val" id="sTotal2">—</div></div>
+        <div class="stat"><div class="stat-label" data-i18n="usageRequests">Requests</div><div class="stat-val" id="sReqs2">—</div></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head"><div class="card-icon" style="background:var(--acs)">📊</div><h2>按模型统计</h2></div>
+        <div id="modelStats"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-icon" style="background:var(--gns)">📋</div><h2>最近请求</h2></div>
+        <div id="recentRequests" style="max-height:360px;overflow-y:auto"></div>
+      </div>
+    </div>
+  </div>
+  <div class="page" id="page-config">
+    <div class="card">
+      <div class="card-head"><div class="card-icon" style="background:var(--acs)">⚙️</div><h2 data-i18n="configuration">Configuration</h2></div>
+      <div class="tabs">
+        <button class="tbtn on" onclick="switchTab('model')" data-i18n="tabModelMap">Model Map</button>
+        <button class="tbtn" onclick="switchTab('providers')" data-i18n="tabProviders">Providers</button>
+        <button class="tbtn" onclick="switchTab('settings')" data-i18n="tabSettings">Settings</button>
+      </div>
+      <div id="panel-model">
+        <div class="fg"><label data-i18n="defaultModel">Default Model</label><select id="defaultModel" onchange="saveDefaultModel()"></select></div>
+        <div class="fg"><label data-i18n="modelMappings">Model Mappings</label><div id="mappings"></div></div>
+        <div class="fg" style="padding-top:10px;border-top:1px solid var(--bdr)"><label data-i18n="addMapping">Add New Mapping</label><div class="irow"><div class="fg"><input id="newFrom" placeholder="Display name (e.g. gpt-4o)"></div><div class="fg"><select id="newProvider"></select></div><div class="fg"><input id="newTo" placeholder="Real model name"></div><button class="btn btn-p btn-s" onclick="addMapping()" data-i18n="btnAdd">+ Add</button></div></div>
+      </div>
+      <div id="panel-providers" style="display:none">
+        <div id="providerList"></div>
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--bdr)"><div class="irow"><div class="fg"><input id="newProvName" placeholder="Provider name" style="font-family:monospace;font-size:.82rem"></div><button class="btn btn-p btn-s" onclick="addProvider()" data-i18n="btnAddProvider">+ Add Provider</button></div></div>
+      </div>
+      <div id="panel-settings" style="display:none">
+        <div class="grid-2"><div class="fg"><label data-i18n="settingPort">Port (restart required)</label><input id="settingPort" type="number" min="1" max="65535"></div><div class="fg"><label data-i18n="settingRetries">Max Retries</label><input id="settingRetries" type="number" min="0" max="10"></div></div>
+        <div class="fg"><label data-i18n="settingLogLevel">Log Level</label><select id="settingLogLevel"><option>DEBUG</option><option>INFO</option><option>WARNING</option><option>ERROR</option></select></div>
+        <button class="btn btn-p" onclick="saveSettings()" data-i18n="btnSaveSettings">Save Settings</button>
+      </div>
+    </div>
+  </div>
+  <div class="page" id="page-tips">
+    <div class="card">
+      <div class="card-head"><div class="card-icon" style="background:var(--acs)">💡</div><h2>Tips &amp; Info</h2></div>
+      <div class="tips-grid">
+        <div class="tip"><div class="tip-e">🖼️</div><div class="tip-t">Multimodal Support</div><div class="tip-d">Image input requires a vision-capable model (e.g. hunyuan-turbo-vision). Standard text models return errors for images.</div></div>
+        <div class="tip"><div class="tip-e">🔄</div><div class="tip-t">Streaming</div><div class="tip-d">The proxy supports SSE streaming. If you see Reconnecting, the upstream may have rejected the request or timed out.</div></div>
+        <div class="tip"><div class="tip-e">📊</div><div class="tip-t">Token Tracking</div><div class="tip-d">Token usage is tracked per-model. Use the time range buttons to filter by today, this week, or all time.</div></div>
+        <div class="tip"><div class="tip-e">⚡</div><div class="tip-t">Quick Switch</div><div class="tip-d">Click the model name in System Status or use the dropdown in the header to quickly switch models.</div></div>
+        <div class="tip"><div class="tip-e">🔒</div><div class="tip-t">Direct HTTPS</div><div class="tip-d">All requests are forwarded directly to providers via HTTPS. No third-party relay involved.</div></div>
+        <div class="tip"><div class="tip-e">📡</div><div class="tip-t">API Compatible</div><div class="tip-d">Fully compatible with OpenAI Responses API. Use any OpenAI SDK client and point it to this proxy.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+
+function switchPage(name) {
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});
+  document.querySelectorAll('.ni').forEach(function(a){a.classList.remove('active')});
+  var page = document.getElementById('page-' + name);
+  if (page) page.classList.add('active');
+  var nav = document.querySelector('.ni[data-page="' + name + '"]');
+  if (nav) nav.classList.add('active');
+  var titles = {dashboard:'navDash',usage:'navUsage',config:'navCfg',tips:'navTips'};
+  var titleEl = document.getElementById('pageTitle');
+  if (titleEl && titles[name]) { titleEl.textContent = t(titles[name]); titleEl.setAttribute('data-i18n', titles[name]); }
+}
+
+// Preset models for common providers (used when API doesn't support /v1/models)
+var presetModels = {
+  'hunyuan': [
+    { id: 'hunyuan-turbo', name: 'hunyuan-turbo' },
+    { id: 'hunyuan-pro', name: 'hunyuan-pro' },
+    { id: 'hunyuan-standard', name: 'hunyuan-standard' },
+    { id: 'hunyuan-lite', name: 'hunyuan-lite' },
+    { id: 'hunyuan-turbo-vision', name: 'hunyuan-turbo-vision' }
+  ],
+  'deepseek': [
+    { id: 'deepseek-chat', name: 'deepseek-chat' },
+    { id: 'deepseek-reasoner', name: 'deepseek-reasoner' },
+    { id: 'deepseek-coder', name: 'deepseek-coder' }
+  ],
+  'glm': [
+    { id: 'glm-4', name: 'glm-4' },
+    { id: 'glm-4-plus', name: 'glm-4-plus' },
+    { id: 'glm-4-air', name: 'glm-4-air' },
+    { id: 'glm-3-turbo', name: 'glm-3-turbo' }
+  ],
+  'mimo': [
+    { id: 'mimo-v2.5', name: 'mimo-v2.5' },
+    { id: 'mimo-v2.5-pro', name: 'mimo-v2.5-pro' },
+    { id: 'mimo-v2', name: 'mimo-v2' }
+  ]
+};
+
+var i18n = {
+  zh: {
+    statusRunning: '运行中', navDash: '仪表盘', navUsage: '用量', navCfg: '配置', navTips: '提示', systemStatus: '系统状态', port: '端口', activeModel: '当前模型', provider: '供应商',
+    providersReady: '已配置 Key', configuration: '配置管理', tabModelMap: '模型映射', tabProviders: '供应商', tabSettings: '设置',
+    defaultModel: '默认模型', modelMappings: '模型映射表', addMapping: '添加新映射',
+    placeholderDisplayName: '显示名 (例: gpt-4o)', placeholderRealModel: '真实模型名', btnAdd: '+ 添加',
+    placeholderProvName: '供应商名 (例: baichuan)', btnAddProvider: '+ 添加供应商',
+    settingPort: '端口 (需重启)', settingRetries: '最大重试次数', settingLogLevel: '日志级别', btnSaveSettings: '保存设置',
+    footer: 'Local Proxy v2.0 · 多供应商 · 直连 HTTPS · 无第三方中转',
+    usageTitle: 'Token 用量', usageInput: '输入 Token', usageOutput: '输出 Token', usageTotal: '总计 Token', usageRequests: '请求次数', recentErrors: '最近错误',
+    btnSave: '保存', btnRemove: '删除', keySet: '已配置', keyUnset: '未设置',
+    noMappings: '暂无映射 — 在下方添加', noProviders: '暂无供应商 — 在下方添加',
+    allFieldsRequired: '请填写所有字段', toastDefaultModel: '默认模型: ', toastRemoved: '已删除: ',
+    toastProvSaved: '供应商已保存', toastProvRemoved: '供应商已删除', toastProvAdded: '供应商已添加 — 请在下方配置',
+    toastProvExists: '供应商已存在', toastNameInvalid: '名称只允许: a-z, 0-9, _, -', toastEnterName: '请输入名称',
+    toastUrlRequired: 'Base URL 不能为空', toastSettingsSaved: '设置已保存',
+    confirmRemoveProv: '确定删除供应商 "{0}" 吗？', offline: '离线', leaveEmpty: '留空则不修改',
+    apiPath: 'API 路径', placeholderApiPath: '例: /chat/completions', supportsReasoning: '支持推理参数', defaultApiPath: '默认: /v1/chat/completions',
+    testConnection: '测试连接', testing: '测试中...', testSuccess: '连接成功', testFailed: '连接失败',
+    foundModels: '找到 {0} 个模型', addAllModels: '添加全部模型', addModel: '添加', modelsFetched: '已获取模型列表'
+  },
+  en: {
+    statusRunning: 'Running', navDash: 'Dashboard', navUsage: 'Usage', navCfg: 'Config', navTips: 'Tips', systemStatus: 'System Status', port: 'Port', activeModel: 'Active Model', provider: 'Provider',
+    providersReady: 'Providers Ready', configuration: 'Configuration', tabModelMap: 'Model Map', tabProviders: 'Providers', tabSettings: 'Settings',
+    defaultModel: 'Default Model', modelMappings: 'Model Mappings', addMapping: 'Add New Mapping',
+    placeholderDisplayName: 'Display name (e.g. gpt-4o)', placeholderRealModel: 'Real model name', btnAdd: '+ Add',
+    placeholderProvName: 'Provider name (e.g. baichuan)', btnAddProvider: '+ Add Provider',
+    settingPort: 'Port (restart required)', settingRetries: 'Max Retries', settingLogLevel: 'Log Level', btnSaveSettings: 'Save Settings',
+    footer: 'Local Proxy v2.0 · Multi-Provider · Direct HTTPS · No Third-Party Relay',
+    usageTitle: 'Token Usage', usageInput: 'Input Tokens', usageOutput: 'Output Tokens', usageTotal: 'Total Tokens', usageRequests: 'Requests', recentErrors: 'Recent Errors',
+    btnSave: 'Save', btnRemove: 'Remove', keySet: 'Set', keyUnset: 'Not set',
+    noMappings: 'No mappings yet — add one below', noProviders: 'No providers configured — add one below',
+    allFieldsRequired: 'All fields required', toastDefaultModel: 'Default model: ', toastRemoved: 'Removed: ',
+    toastProvSaved: 'Provider saved', toastProvRemoved: 'Provider removed', toastProvAdded: 'Provider added — configure it below',
+    toastProvExists: 'Provider already exists', toastNameInvalid: 'Name: only a-z, 0-9, _, -', toastEnterName: 'Enter a name',
+    toastUrlRequired: 'Base URL is required', toastSettingsSaved: 'Settings saved',
+    confirmRemoveProv: 'Really remove provider "{0}"?', offline: 'Offline', leaveEmpty: 'Leave empty to keep current',
+    apiPath: 'API Path', placeholderApiPath: 'e.g. /chat/completions', supportsReasoning: 'Supports Reasoning', defaultApiPath: 'Default: /v1/chat/completions',
+    testConnection: 'Test Connection', testing: 'Testing...', testSuccess: 'Connected', testFailed: 'Failed',
+    foundModels: 'Found {0} models', addAllModels: 'Add All Models', addModel: 'Add', modelsFetched: 'Models fetched',
+    usePresetModels: 'Use Preset Models', presetModelsAdded: 'Preset models added'
+  }
+};
+
+var currentLang = localStorage.getItem('lang') || 'en';
+
+function t(key) { return (i18n[currentLang] && i18n[currentLang][key]) || (i18n.en[key]) || key; }
+
+function applyLang() {
+  document.querySelectorAll('[data-i18n]').forEach(function(el) { el.textContent = t(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) { el.placeholder = t(el.getAttribute('data-i18n-placeholder')); });
+  document.getElementById('langLabel').textContent = currentLang === 'zh' ? '中文' : 'EN';
+  document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+  if (typeof modelMap !== 'undefined') { renderMappings(); renderProviders(); }
+}
+
+function toggleLang() {
+  currentLang = currentLang === 'zh' ? 'en' : 'zh';
+  localStorage.setItem('lang', currentLang);
+  applyLang();
+}
+
+function toast(msg, isError) {
+  var el = document.createElement('div');
+  el.className = 'tst ' + (isError ? 'err' : 'ok');
+  el.textContent = msg;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(function() { el.style.opacity = '0'; el.style.transform = 'translateX(40px)'; el.style.transition = 'all 0.25s ease'; setTimeout(function() { el.remove(); }, 250); }, 2200);
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tbtn').forEach(function(b){ b.classList.remove('on'); });
+  event.target.classList.add('on');
+  document.getElementById('panel-model').style.display = name === 'model' ? 'block' : 'none';
+  document.getElementById('panel-providers').style.display = name === 'providers' ? 'block' : 'none';
+  document.getElementById('panel-settings').style.display = name === 'settings' ? 'block' : 'none';
+}
+
+var modelMap = {};
+var providers = {};
+var defaultModel = '';
+
+async function loadConfig() {
+  try {
+    var r = await fetch('/api/config');
+    var cfg = await r.json();
+    defaultModel = cfg.default_model || '';
+    modelMap = cfg.model_map || {};
+    providers = cfg.providers || {};
+
+    document.getElementById('sPort').textContent = cfg.port;
+    document.getElementById('sModel').textContent = defaultModel;
+
+    var mapping = modelMap[defaultModel];
+    var provName = typeof mapping === 'object' ? (mapping.provider || '?') : (Object.keys(providers)[0] || '?');
+    document.getElementById('sProvider').textContent = provName;
+
+    var ready = 0;
+    Object.values(providers).forEach(function(p) { if (p.api_key_masked && p.api_key_masked !== 'unset') ready++; });
+    document.getElementById('sReady').textContent = ready + ' / ' + Object.keys(providers).length;
+
+    document.getElementById('settingPort').value = cfg.port || 2000;
+    document.getElementById('settingRetries').value = cfg.max_retries || 3;
+    document.getElementById('settingLogLevel').value = cfg.log_level || 'INFO';
+
+    renderDefaultModelSelect();
+    renderMappings();
+    renderProviders();
+    updateProviderSelect();
+    renderHeaderModelSelect();
+    applyLang();
+    loadStats();
+  } catch(e) {
+    var dot = document.querySelector('.status-dot');
+    dot.style.background = 'var(--rd)'; dot.style.animation = 'none';
+    document.getElementById('statusText') && (document.getElementById('statusText').textContent = t('offline'));
+  }
+}
+
+function renderDefaultModelSelect() {
+  var sel = document.getElementById('defaultModel');
+  sel.innerHTML = '';
+  Object.keys(modelMap).forEach(function(m) {
+    var opt = document.createElement('option');
+    opt.value = m; opt.textContent = m;
+    if (m === defaultModel) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+async function saveDefaultModel() {
+  var m = document.getElementById('defaultModel').value;
+  await fetch('/api/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ default_model: m }) });
+  defaultModel = m; loadConfig(); toast(t('toastDefaultModel') + m);
+}
+
+function renderMappings() {
+  var el = document.getElementById('mappings');
+  if (!Object.keys(modelMap).length) { el.innerHTML = '<div class="empty-state">' + t('noMappings') + '</div>'; return; }
+  el.innerHTML = '';
+  Object.entries(modelMap).forEach(function(e) {
+    var name = e[0], m = e[1];
+    var target = typeof m === 'object' ? m.model : m;
+    var prov = typeof m === 'object' ? m.provider : (Object.keys(providers)[0] || '?');
+    var tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.innerHTML = '<span class="tag-from">' + name + '</span><span class="tag-arrow">→</span><span class="tag-to">' + prov + ':' + target + '</span><span class="tag-rm" onclick="removeMapping(\'' + name + '\')">×</span>';
+    el.appendChild(tag);
+  });
+}
+
+function updateProviderSelect() {
+  var sel = document.getElementById('newProvider');
+  sel.innerHTML = '';
+  Object.keys(providers).forEach(function(p) {
+    var opt = document.createElement('option');
+    opt.value = p; opt.textContent = p;
+    sel.appendChild(opt);
+  });
+}
+
+async function addMapping() {
+  var from = document.getElementById('newFrom').value.trim();
+  var prov = document.getElementById('newProvider').value;
+  var to = document.getElementById('newTo').value.trim();
+  if (!from || !prov || !to) { toast(t('allFieldsRequired'), true); return; }
+  modelMap[from] = { provider: prov, model: to };
+  await fetch('/api/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model_map: modelMap }) });
+  document.getElementById('newFrom').value = '';
+  document.getElementById('newTo').value = '';
+  loadConfig();
+  toast(from + ' → ' + prov + ':' + to);
+}
+
+async function removeMapping(name) {
+  delete modelMap[name];
+  await fetch('/api/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model_map: modelMap }) });
+  loadConfig(); toast(t('toastRemoved') + name);
+}
+
+function renderProviders() {
+  var el = document.getElementById('providerList');
+  if (!Object.keys(providers).length) { el.innerHTML = '<div class="empty-state">' + t('noProviders') + '</div>'; return; }
+  el.innerHTML = '';
+  Object.entries(providers).forEach(function(e) {
+    var name = e[0], p = e[1];
+    var hasKey = p.api_key_masked && p.api_key_masked !== 'unset';
+    var keyHint = hasKey ? ('✓ ' + p.api_key_masked) : t('keyUnset');
+    var card = document.createElement('div');
+    card.className = 'provider-card';
+    card.innerHTML =
+      '<div class="pv-header">' +
+        '<span class="pv-name"><span class="pv-dot ' + (hasKey ? 'has-key' : 'no-key') + '"></span>' + name + '</span>' +
+        '<div class="pv-actions">' +
+          '<button class="btn btn-p btn-s" onclick="saveProvider(\'' + name + '\')">' + t('btnSave') + '</button>' +
+          '<button class="btn btn-d btn-s" onclick="removeProvider(\'' + name + '\')">' + t('btnRemove') + '</button>' +
+          '<button class="btn btn-sm" onclick="testProvider(\'' + name + '\')" id="test_btn_' + name + '" style="background:var(--gns);color:var(--gn);border:1px solid rgba(16,185,129,0.25)">' + t('testConnection') + '</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="pv-fields">' +
+        '<div><div class="pv-field-label">Base URL</div><input id="pv_url_' + name + '" value="' + (p.base_url || '') + '" placeholder="https://api.example.com"></div>' +
+        '<div><div class="pv-field-label">API Key (' + keyHint + ')</div><input id="pv_key_' + name + '" type="password" placeholder="' + t('leaveEmpty') + '"></div>' +
+        '<div><div class="pv-field-label">' + t('apiPath') + ' <span style="font-size:0.65rem;color:var(--t3)">(' + t('defaultApiPath') + ')</span></div><input id="pv_path_' + name + '" value="' + (p.api_path || '') + '" placeholder="/v1/chat/completions"></div>' +
+        '<div style="display:flex;align-items:center;gap:8px;padding-top:8px"><label style="font-size:0.76rem;color:var(--t2);cursor:pointer"><input type="checkbox" id="pv_reasoning_' + name + '" ' + (p.supports_reasoning_effort ? 'checked' : '') + ' style="margin-right:4px;cursor:pointer">' + t('supportsReasoning') + '</label></div>' +
+      '</div>' +
+      '<div id="test_result_' + name + '" style="display:none;margin-top:10px;padding:10px;background:var(--bg3);border-radius:var(--rs);font-size:0.8rem"></div>';
+    el.appendChild(card);
+  });
+}
+
+async function saveProvider(name) {
+  var url = document.getElementById('pv_url_' + name).value.trim();
+  var key = document.getElementById('pv_key_' + name).value.trim();
+  var path = document.getElementById('pv_path_' + name).value.trim();
+  var reasoning = document.getElementById('pv_reasoning_' + name).checked;
+  if (!url) { toast(t('toastUrlRequired'), true); return; }
+  if (!providers[name]) providers[name] = {};
+  providers[name].base_url = url;
+  if (key) providers[name].api_key = key;
+  if (path) providers[name].api_path = path; else delete providers[name].api_path;
+  providers[name].supports_reasoning_effort = reasoning;
+  await fetch('/api/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ providers: providers }) });
+  document.getElementById('pv_key_' + name).value = '';
+  loadConfig();
+  toast(t('toastProvSaved'));
+}
+
+async function testProvider(name) {
+  var urlEl = document.getElementById('pv_url_' + name);
+  var keyEl = document.getElementById('pv_key_' + name);
+  var pathEl = document.getElementById('pv_path_' + name);
+  var resultDiv = document.getElementById('test_result_' + name);
+  var btn = document.getElementById('test_btn_' + name);
+
+  if (!urlEl || !resultDiv || !btn) {
+    toast('Error: Provider element not found. Please refresh the page.', true);
+    console.error('testProvider: Element not found for', name);
+    return;
+  }
+
+  var url = urlEl.value.trim();
+  var key = keyEl ? keyEl.value.trim() : '';
+  var path = pathEl ? pathEl.value.trim() : '';
+
+  if (!url) { toast(t('toastUrlRequired'), true); return; }
+
+  btn.textContent = t('testing');
+  btn.disabled = true;
+  resultDiv.style.display = 'block';
+  resultDiv.innerHTML = '<span style="color:var(--t3)">' + t('testing') + '</span>';
+
+  try {
+    // Send provider_name so backend can load real api_key from config
+    var body = { provider_name: name };
+    if (url) body.base_url = url;
+    if (key) body.api_key = key;  // Only send if user typed a new key
+    if (path) body.api_path = path;
+
+    console.log('Test provider request:', body);  // Debug log
+
+    var resp = await fetch('/api/providers/test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    var data = await resp.json();
+
+    if (!resp.ok || data.error) {
+      resultDiv.innerHTML = '<span style="color:var(--rd)">' + t('testFailed') + ': ' + (data.error || resp.statusText) + '</span>';
+      btn.textContent = t('testConnection');
+      btn.disabled = false;
+      return;
+    }
+
+    var models = data.models || [];
+    if (!models.length) {
+      var presetHtml = '';
+      if (presetModels[name] && presetModels[name].length) {
+        presetHtml = '<div style="margin-top:8px"><button class="btn btn-p btn-s" onclick="addPresetModels(\'' + name + '\')">' + t('usePresetModels') + '</button></div>';
+      }
+      resultDiv.innerHTML = '<span style="color:var(--t3)">' + t('testSuccess') + ' ' + t('modelsFetched') + ' ' + t('foundModels').replace('{0}', '0') + '</span>' + presetHtml;
+      btn.textContent = t('testConnection');
+      btn.disabled = false;
+      return;
+    }
+
+    resultDiv.innerHTML = '<div style="margin-bottom:8px"><span style="color:var(--gn)">' + t('testSuccess') + '</span> — ' + t('foundModels').replace('{0}', models.length) + '</div>' +
+      '<div style="margin-bottom:8px"><button class="btn btn-p btn-s" onclick="addAllModels(\'' + name + '\', ' + JSON.stringify(models).replace(/"/g, '&quot;') + ')">' + t('addAllModels') + '</button></div>' +
+      '<div style="max-height:200px;overflow-y:auto">' +
+      models.map(function(m) {
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--bdr)">' +
+          '<span>' + m.id + '</span>' +
+          '<button class="btn btn-sm" onclick="addModel(\'' + name + '\', \'' + m.id + '\')" style="padding:2px 8px;font-size:0.7rem;background:var(--acs);color:var(--ac)">' + t('addModel') + '</button>' +
+        '</div>';
+      }).join('') +
+      '</div>';
+
+    btn.textContent = t('testConnection');
+    btn.disabled = false;
+
+  } catch(e) {
+    resultDiv.innerHTML = '<span style="color:var(--rd)">' + t('testFailed') + ': ' + e.message + '</span>';
+    btn.textContent = t('testConnection');
+    btn.disabled = false;
+  }
+}
+
+async function addModel(providerName, modelId) {
+  if (modelMap[modelId]) {
+    toast('Model already exists: ' + modelId, true);
+    return;
+  }
+  modelMap[modelId] = { provider: providerName, model: modelId };
+  await fetch('/api/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model_map: modelMap }) });
+  loadConfig();
+  toast(t('addModel') + ': ' + modelId);
+}
+
+async function addPresetModels(providerName) {
+  var models = presetModels[providerName];
+  if (!models || !models.length) {
+    toast('No preset models for ' + providerName, true);
+    return;
+  }
+  var added = 0;
+  models.forEach(function(m) {
+    if (!modelMap[m.id]) {
+      modelMap[m.id] = { provider: providerName, model: m.name };
+      added++;
+    }
+  });
+  if (added > 0) {
+    await fetch('/api/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model_map: modelMap }) });
+    loadConfig();
+  }
+  toast(t('presetModelsAdded') + ' (' + added + ')');
+}
+
+async function addAllModels(providerName, models) {
+  var added = 0;
+  models.forEach(function(m) {
+    if (!modelMap[m.id]) {
+      modelMap[m.id] = { provider: providerName, model: m.id };
+      added++;
+    }
+  });
+  if (added > 0) {
+    await fetch('/api/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model_map: modelMap }) });
+    loadConfig();
+  }
+  toast(t('addAllModels') + ' (' + added + ')');
+}
+
+async function removeProvider(name) {
+  if (!confirm(t('confirmRemoveProv').replace('{0}', name))) return;
+  delete providers[name];
+  // Also remove related model mappings
+  var newModelMap = {};
+  for (var m in modelMap) {
+    if (modelMap[m].provider !== name) newModelMap[m] = modelMap[m];
+  }
+  modelMap = newModelMap;
+  try {
+    var resp = await fetch('/api/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ providers: providers, model_map: modelMap })
+    });
+    var data = await resp.json();
+    console.log('Remove provider response:', data);
+    loadConfig();
+    toast(t('toastProvRemoved'));
+  } catch(e) {
+    toast('Error: ' + e.message, true);
+    console.error('Remove provider error:', e);
+  }
+}
+
+async function addProvider() {
+  var name = document.getElementById('newProvName').value.trim().toLowerCase();
+  if (!name) { toast(t('toastEnterName'), true); return; }
+  if (!/^[a-z0-9_-]+$/.test(name)) { toast(t('toastNameInvalid'), true); return; }
+  if (providers[name]) { toast(t('toastProvExists'), true); return; }
+  providers[name] = { base_url: '', api_key: '' };
+  await fetch('/api/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ providers: providers }) });
+  document.getElementById('newProvName').value = '';
+  loadConfig(); toast(t('toastProvAdded'));
+}
+
+async function saveSettings() {
+  var updates = {
+    port: parseInt(document.getElementById('settingPort').value) || 2000,
+    max_retries: parseInt(document.getElementById('settingRetries').value) || 3,
+    log_level: document.getElementById('settingLogLevel').value
+  };
+  await fetch('/api/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updates) });
+  loadConfig(); toast(t('toastSettingsSaved'));
+}
+
+function renderHeaderModelSelect() {
+  var sel = document.getElementById('headerModel');
+  if (!sel) return;
+  sel.innerHTML = '';
+  Object.keys(modelMap).forEach(function(m) {
+    var opt = document.createElement('option');
+    opt.value = m; opt.textContent = m;
+    if (m === defaultModel) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+async function switchModelFromHeader() {
+  var m = document.getElementById('headerModel').value;
+  await fetch('/switch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: m }) });
+  defaultModel = m;
+  updateStatus();
+  renderDefaultModelSelect();
+  renderHeaderModelSelect();
+  toast(t('toastDefaultModel') + m);
+}
+
+function quickSwitchModel() {
+  var sel = document.getElementById('headerModel');
+  if (sel) { sel.focus(); sel.click(); }
+}
+
+function updateStatus() {
+  document.getElementById('sModel').textContent = defaultModel;
+  var mapping = modelMap[defaultModel];
+  var provName = typeof mapping === 'object' ? (mapping.provider || '?') : (Object.keys(providers)[0] || '?');
+  document.getElementById('sProvider').textContent = provName;
+}
+
+var currentTimeRange = 'today';
+
+function setTimeRange(range) {
+  currentTimeRange = range;
+  ['today', 'week', 'all'].forEach(function(r) {
+    var btn = document.getElementById('range' + r.charAt(0).toUpperCase() + r.slice(1));
+    if (btn) btn.className = r === range ? 'rbtn on' : 'rbtn';
+  });
+  loadStats();
+}
+
+async function loadStats() {
+  try {
+    var r = await fetch('/api/stats');
+    var s = await r.json();
+
+    // Filter requests by time range
+    var now = new Date();
+    var todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    var weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).getTime();
+
+    var filteredRequests = (s.requests || []).filter(function(req) {
+      if (currentTimeRange === 'all') return true;
+      var reqTime = new Date(req.time).getTime();
+      if (currentTimeRange === 'today') return reqTime >= todayStart;
+      if (currentTimeRange === 'week') return reqTime >= weekStart;
+      return true;
+    });
+
+    // Calculate totals from filtered requests
+    var totalInput = 0, totalOutput = 0;
+    var byModel = {};
+    filteredRequests.forEach(function(req) {
+      totalInput += req.input || 0;
+      totalOutput += req.output || 0;
+      if (!byModel[req.model]) byModel[req.model] = { input: 0, output: 0, requests: 0 };
+      byModel[req.model].input += req.input || 0;
+      byModel[req.model].output += req.output || 0;
+      byModel[req.model].requests += 1;
+    });
+
+    document.getElementById('sInput').textContent = totalInput.toLocaleString();
+    document.getElementById('sOutput').textContent = totalOutput.toLocaleString();
+    document.getElementById('sTotal').textContent = (totalInput + totalOutput).toLocaleString();
+    document.getElementById('sReqs').textContent = filteredRequests.length;
+    var sI2=document.getElementById('sInput2');if(sI2)sI2.textContent=totalInput.toLocaleString();
+    var sO2=document.getElementById('sOutput2');if(sO2)sO2.textContent=totalOutput.toLocaleString();
+    var sT2=document.getElementById('sTotal2');if(sT2)sT2.textContent=(totalInput+totalOutput).toLocaleString();
+    var sR2=document.getElementById('sReqs2');if(sR2)sR2.textContent=filteredRequests.length;
+
+    // Render by-model stats
+    var modelStatsEl = document.getElementById('modelStats');
+    var models = Object.keys(byModel);
+    if (!models.length) {
+      modelStatsEl.innerHTML = '<div class="empty-state" style="padding:12px">暂无数据</div>';
+    } else {
+      modelStatsEl.innerHTML = models.map(function(m) {
+        var d = byModel[m];
+        return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bdr)">' +
+          '<span style="font-size:0.82rem;color:var(--t1)">' + m + '</span>' +
+          '<span style="font-size:0.82rem;color:var(--t2)">输入 ' + d.input.toLocaleString() + ' / 输出 ' + d.output.toLocaleString() + ' (' + d.requests + ' 次)</span>' +
+        '</div>';
+      }).join('');
+    }
+
+    // Render recent requests
+    var recentEl = document.getElementById('recentRequests');
+    var recent = filteredRequests.slice(-20).reverse();
+    if (!recent.length) {
+      recentEl.innerHTML = '<div class="empty-state" style="padding:12px">暂无请求</div>';
+    } else {
+      recentEl.innerHTML = recent.map(function(req) {
+        var errTag = req.error ? '<span style="color:var(--rd);font-size:0.72rem;margin-left:6px" title="' + (req.error||'').replace(/"/g,'&quot;') + '">⚠</span>' : '';
+        return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bdr);font-size:0.78rem">' +
+          '<span style="color:var(--t2)">' + req.time + '</span>' +
+          '<span style="color:var(--t1)">' + req.model + errTag + '</span>' +
+          '<span style="color:var(--ac)">' + (req.input || 0) + '/' + (req.output || 0) + '</span>' +
+        '</div>';
+      }).join('');
+    }
+
+    // Render error log
+    var errorLogEl = document.getElementById('errorLog');
+    var errorReqs = filteredRequests.filter(function(r){ return r.error; }).slice(-10).reverse();
+    var totalErrors = filteredRequests.filter(function(r){ return r.error; }).length;
+    var sErrEl = document.getElementById('sErrors');
+    if (sErrEl) sErrEl.textContent = totalErrors;
+    if (!errorReqs.length) {
+      errorLogEl.innerHTML = '';
+    } else {
+      errorLogEl.innerHTML = errorReqs.map(function(req) {
+        return '<div class="er">' +
+          '<span class="er-t">' + req.time + '</span>' +
+          '<span class="er-m">' + req.model + '</span>' +
+          '<span class="er-msg" title="' + (req.error||'').replace(/"/g,'&quot;') + '">' + (req.error||'Unknown error') + '</span>' +
+        '</div>';
+      }).join('');
+    }
+
+  var dE=document.getElementById('errorLogDash');if(dE)dE.innerHTML=errorLogEl.innerHTML;
+  } catch(e) {}
+}
+
+loadConfig();
+setInterval(loadStats, 5000);
+
+</script>
+</body>
+</html>
